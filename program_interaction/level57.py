@@ -6,3 +6,5 @@ output = p2.communicate()[0]
 print(output)
 
 #没啥说的，就是将/challenge/run 的执行结果，作为输入进rev指令
+#rev注意反转问题，需要输入反转后的密码来转正
+#python
