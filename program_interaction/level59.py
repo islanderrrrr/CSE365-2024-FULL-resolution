@@ -9,4 +9,5 @@ r, e=out.communicate();
 //out.communicate()用于等待/challenge/run子进程完成执行，并获取该进程的输出r和错误输出e
 print(r.decode());
 
+#rev注意反转问题，需要输入反转后的密码来转正
 #python
