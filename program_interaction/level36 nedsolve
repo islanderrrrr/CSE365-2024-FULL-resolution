@@ -1,0 +1,3 @@
+#目前遇到的问题:
+#[FAIL]   Executable must be 'cat'. Yours is: coreutils
+#已知'coreutils'是个整合包，包含有'cat'等多种语法，其他可行，cat无法检测
