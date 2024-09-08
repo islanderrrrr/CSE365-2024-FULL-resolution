@@ -1,3 +1,7 @@
 find . -name "4*" -exec /challenge/run luboasvuad \;
 
-#
+#find命令格式：
+find   path  -option  【 -print 】  【 -exec   -ok   |xargs  |grep  】 【  command  {} \;  】
+#exec：对匹配的文件执行该参数所给出的shell命令。 
+形式为command {} \;，注意{}与\;之间有空格
+#输入参数只需要在/challenge/run可执行文件后输入即可
