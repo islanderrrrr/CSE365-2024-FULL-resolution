@@ -1,0 +1,4 @@
+#.....
+#这一次一样的，username=admin,只不过加了个cookies，因此我们要用到
+curl -H "cookie：key=value" http://example/
+#不写答案了，思考一下即可，我就因为这句话得出来的
