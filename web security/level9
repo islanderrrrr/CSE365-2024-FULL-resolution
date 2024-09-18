@@ -1,0 +1,5 @@
+#Authentication Bypass 1
+#cat /challenge/server(不复制)
+#简而言之，你要用admin的username登陆
+#有一个知识点：用POST需求表单里的数据，即username和password；但是GET请求只需要username=admin即可
+#所以 curl -v "http://challenge.localhost?session_name=admin"
