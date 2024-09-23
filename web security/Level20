@@ -1,0 +1,20 @@
+#XSS 5
+#挑战简介
+Actual XSS exploits try to achieve something more than alert("PWNED"). 
+A very common goal is to use the ability to execute JavaScript inside a victim's browser to initiate new HTTP requests masquerading as the victim. 
+This can be done in a number of ways, including using JavaScript's fetch() function.
+
+This challenge implements a more complex application, and you will need to retrieve the flag out of the admin user's unpublished draft post. 
+After XSS-injecting the admin, you must use the injection to make an HTTP request (as the admin user) to enable you to read the flag. Good luck
+
+#这一次GUI和workspace都要开，GUI用于访问网页，workspace用于cat server 和执行victim，这次不cat出来了，太长了。
+
+#感想：这个挑战真的有点难，做了两天，我来阐述一下我的思路(做的整个人都变得抽象了)
+#题目要求：在GUI页面进入后，会进入一个登陆界面，登录进去后，给了一个空间让你发帖子，而你要做的，就是进入帖子界面，发布alert("PWNED")脚本，并且这个脚本对admin以及任何人
+都生效。
+#(仔细看server的内容，包括了许多信息，譬如你登陆的账号，以及草稿箱，和发布流程)
+#首先我们用已有的创建的SQL账号信息登陆进去后，发布content：<script>fetch("http://challenge.localhost/publish",{method:'GET'})</script>(暂时没太搞懂什么意思)
+而后再次输入<script>alert("PWNED")</script>
+
+#GUI端，使用执行victim
+/challenge/victim （这里的作用是以admin的身份登陆进帖子目录，会进行一次判断，被alert了的时候，帖子区不完整的flag会变得完整，即为挑战成功）
