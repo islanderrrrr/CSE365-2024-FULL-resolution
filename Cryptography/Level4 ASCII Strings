@@ -1,0 +1,16 @@
+#挑战简介
+————————————————
+#和上一题类似，只不过从单个变成了字符串
+#所以思路就是一个一个解啦...
+#Python中有代码如是说到
+hacker@dojo:~$ python
+>>> from Crypto.Util.strxor import strxor
+>>> strxor(b"AAA", b"16/")
+b'pwn'
+#所以懂得都懂，用python去解吧，你懂原理即可。
+#Python关键代码
+from Crypto.Util.strxor import strxor
+
+strxor(b"Encrypted String", b"key")
+
+###
