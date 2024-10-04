@@ -1,0 +1,12 @@
+#挑战简介(太长了没有)
+
+#总而言之，Ascii码代表了众多字符，例如你键盘的所有字符都可以用Ascii码代表
+#这次你要利用挑战给你的字符，转化成十六进制，再用十六进制的key对它进行解密。
+#十道题，做错重来，好好折磨。
+
+#挑战形式：
+hacker@dojo:~$ /challenge/run
+Challenge number 0...
+- Encrypted Character: A
+- XOR Key: 0x01
+- Decrypted Character?
