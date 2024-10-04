@@ -1,0 +1,19 @@
+#挑战简介
+
+#此次挑战的flag用base64加密了
+#base64由6个byte组成，区别于其他base编码的区别是，对于空格等特殊字符，具有包容性
+#其次还有一点
+To mark these unused bytes, base64 encoded data appends an = for every two unused bytes. For example:
+
+hacker@dojo:~$ echo -n A | base64
+QQ==
+hacker@dojo:~$ echo -n AA | base64
+QUE=
+hacker@dojo:~$ echo -n AAA | base64
+QUFB
+hacker@dojo:~$ echo -n AAAA | base64
+QUFBQQ==
+hacker@dojo:~$
+
+#因此只要对flag进行base64解密即可
+###
