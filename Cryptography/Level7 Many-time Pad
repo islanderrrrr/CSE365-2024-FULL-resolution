@@ -1,0 +1,36 @@
+#挑战简介
+
+#多次使用的密码版
+#这次挑战只给了一个base64编码的flag密文以及明文，而你要根据密文推导出密钥从而解密。
+#多用密码版是非常危险的，因为不具有私有性，所以容易泄露。
+#输入密文，可获得明文
+#获得明文后，即可开始写python代码
+#!/usr/bin/python3
+import base64
+
+# 已知的 Base64 编码的密文
+ciphertext_b64 = "cHduLmNvbGxlZ2V7SVY5OFhMTEFYX2ZrTUYtcDNSQlZNbUs2MnVBLmRWek56TURMMEVUTTJZeld9Cg=="
+plaintext_b64 = "nvF947lTRRxgBwchUNVJEiuv+HkUIdKnhCG8OCIlnjB8jgNPX/r6sOEN5NwslgRJtTvdb8ysobnjpA=="
+
+# 解码 Base64
+ciphertext = base64.b64decode(ciphertext_b64)
+plaintext = base64.b64decode(plaintext_b64)
+
+# 从密文和明文计算密钥
+key = bytes([c ^ p for c, p in zip(ciphertext, plaintext)])
+
+# 尝试用这个密钥解密 flag 密文
+flag_ciphertext_b64 = "nvF947lTRRxgBwchUNVJEiuv+HkUIdKnhCG8OCIlnjB8jgNPX/r6sOEN5NwslgRJtTvdb8ysobnjpA=="
+flag_ciphertext = base64.b64decode(flag_ciphertext_b64)
+
+# 解密 flag
+decrypted_flag = ''.join(chr(flag_ciphertext[i] ^ key[i % len(key)]) for i in range(len(flag_ciphertext)))
+
+for i in range(len(flag_ciphertext)) 遍历 flag 密文的每一个字节的索引。
+key[i % len(key)] 使用模运算确保在密钥的长度范围内循环使用密钥。这样，当密钥比密文短时，密钥会被重复使用。
+flag_ciphertext[i] ^ key[i % len(key)] 对每个字节执行 XOR 运算，以解密。
+chr(...) 将解密得到的数字转换为对应的字符。
+''.join(...) 将所有解密后的字符拼接成一个完整的字符串。
+
+# 输出解密后的 flag
+print(decrypted_flag)
