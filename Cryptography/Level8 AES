@@ -1,0 +1,31 @@
+#挑战简介
+
+#AES解密过程
+解密过程基本上是加密过程的逆过程，主要包括以下几个步骤：
+
+逆变换：使用密钥的逆变换。
+移位行（Inverse Shift Rows）：将行循环右移。
+逆列混合（Inverse Mix Columns）：将列进行逆混合，以恢复原始数据结构（仅在CBC等模式下使用）。
+逆轮密钥（Add Round Key）：将当前数据块与轮密钥进行 XOR 运算。
+
+#代码如下
+import base64
+from Crypto.Cipher import AES
+from Crypto.Hash import HMAC, SHA256
+
+# AES Key 和 Flag Ciphertext 的 Base64 编码
+key_b64 = "8wRA4MWVMsgflvSztBcCjw=="
+ciphertext_b64 = "87zMmnfchFstJdaQD16RjGwjfBEq0mZKtD191pE+X4av2kLuw7sSVz0mfcOwIHNFGVwkvR7c/RIJN9mQLePXfg=="
+
+# 解码 Base64
+key = base64.b64decode(key_b64)
+ciphertext = base64.b64decode(ciphertext_b64)
+
+# 初始化 AES 解密器
+cipher = AES.new(key, AES.MODE_ECB)
+
+# 解密密文，去除填充
+plaintext = cipher.decrypt(ciphertext)
+
+# 输出明文
+print(plaintext.decode())
