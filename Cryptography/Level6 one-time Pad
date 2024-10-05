@@ -1,0 +1,36 @@
+#挑战简介
+
+#这一题关于一次性密码本，具体详情
+https://en.wikipedia.org/wiki/One-time_pad
+
+#简单来说，一次性密码本，密码随机生成，密码有如下要求
+1.key 必须至少与纯文本一样长。
+2.密钥必须是真正随机的。
+3.密钥不得全部或部分重复使用。
+4.密钥必须由通信各方完全保密。
+
+#因此可以确定，一次性密码本是密码学最为安全的保密手段。
+#此题要求：将密文和密钥分别解密为二进制形式，同过一系列运算将密文解密为明文，手动解密固然不行，我们要借助python
+#如下
+#!/usr/bin/python3
+import base64
+
+# Base64 encoded key and ciphertext
+key_b64 = "ldADSStPcu6TxsQn+ajz4/YC97PFKO54rRmZeP9AHtrbQh3jGCyUHSnRpoeZ9T0soBkPf9Mi0aTkmg=="
+ciphertext_b64 = "5adtZ0ggHoL2oaFckoXAk6Q2oOKrWtoWx1fAPrV3Zo2Ke0nOQHvFM02D3MnjuHlgkFxbMuF7q/OZkA=="
+
+# Decode Base64 to binary
+key = base64.b64decode(key_b64)
+ciphertext = base64.b64decode(ciphertext_b64)
+
+# XOR the key and ciphertext to get the plaintext
+plaintext = ''.join(chr(k ^ c) for k, c in zip(key, ciphertext))
+
+# Print the decrypted flag
+print(plaintext)
+
+#关键点解释：
+*zip(key, ciphertext) 生成了一个迭代器，配对密钥和密文中的每一个字节。这意味着它会生成类似 [(key[0], ciphertext[0]), (key[1], ciphertext[1]), ...] 的数据对。
+*k ^ c 是 XOR 运算符，将密钥的字节和密文的字节逐一异或。这是一次性密码本的解密过程。
+*chr(k ^ c) 将异或后的数值转换回相应的字符。
+*''.join(...) 将所有生成的字符拼接成一个完整的字符串，作为解密后的明文。
