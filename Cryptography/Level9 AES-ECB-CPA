@@ -16,3 +16,56 @@
 *pwntools
 
 #代码如下：
+*我将解释每一段代码，都是我花费了超长时间学到的
+#!/usr/bin/python
+from pwn import *  //引入pwntools
+
+d = []        开辟一个数组，用于存放字典，包括字符和加密密文
+valid_ascii = (
+    list(range(48, 58))+      //0~9
+    list(range(65, 91))+        //A~Z
+    list(range(97, 123))+         //a~z
+    [45, 46, 95, 173, 175]          //特殊字符
+)
+#d[valid_ascii[0]] = chr(valid_ascii[0])      
+#print(d[valid_ascii[0]])
+context(os='linux',arch='AMD64',log_level='debug')
+
+p = process('/challenge/run')
+
+def encryascii(number):
+    for i in range(number):
+        p.recvline(b'Choice?')
+        p.sendline(b'1')
+        p.recvuntil(b'Data?')
+        p.sendline(chr(valid_ascii[i]))
+        p.recvuntil(b'Result:')
+        data=p.recvline().strip()
+        d.append((chr(valid_ascii[i]),data))
+        if chr(valid_ascii[i]) == '_':
+            break
+
+def encrypt_flag_char(index,length):
+    p.recvline(b'Choice?')
+    p.sendline(b'2')
+    p.recvline(b'Index?')
+    p.sendline(str(index).encode())
+    p.recvuntil(b'Length?')
+    p.sendline(str(length).encode())
+    p.recvuntil(b'Result:')
+    return p.recvline().strip()
+
+encryascii(len(valid_ascii))
+
+flag = ''
+for idx in range(58):
+    encry_char = encrypt_flag_char(idx, 1)
+    for char, enc_data in d:
+        if enc_data == encry_char:
+            flag += char
+            print(f"Found character {char} at index {idx}")
+            break
+
+#for idx, data in enumerate(d):
+    #print(f"Result for {chr(valid_ascii[idx])}: {data.decode()}")
+print(f"the flag {flag}")
