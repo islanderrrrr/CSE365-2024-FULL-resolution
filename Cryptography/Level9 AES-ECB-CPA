@@ -29,43 +29,46 @@ valid_ascii = (
 )
 #d[valid_ascii[0]] = chr(valid_ascii[0])      
 #print(d[valid_ascii[0]])
-context(os='linux',arch='AMD64',log_level='debug')
+context(os='linux',arch='AMD64',log_level='debug')        
+*context：设置 pwntools 的上下文，指定目标系统为 Linux，架构为 AMD64，并将日志级别设置为 debug，以便输出详细调试信息。
 
-p = process('/challenge/run')
+p = process('/challenge/run')        //启动内地进程
 
-def encryascii(number):
-    for i in range(number):
-        p.recvline(b'Choice?')
-        p.sendline(b'1')
-        p.recvuntil(b'Data?')
-        p.sendline(chr(valid_ascii[i]))
-        p.recvuntil(b'Result:')
-        data=p.recvline().strip()
-        d.append((chr(valid_ascii[i]),data))
-        if chr(valid_ascii[i]) == '_':
+def encryascii(number):                //字典加密储存函数
+    for i in range(number):            //for循环 对每个字符进行加密储存
+        p.recvline(b'Choice?')         //recvline 接收语句"Choice?"
+        p.sendline(b'1')                //sendline 输入语句'1'
+        p.recvuntil(b'Data?')            //接收语句 'Data?'
+        p.sendline(chr(valid_ascii[i]))        //输入 '字典中每个字符'
+        p.recvuntil(b'Result:')                //recvuntil 接收直到出现 'Result:'
+        data=p.recvline().strip()                //data变量储存 'Result:后面的密文'
+        d.append((chr(valid_ascii[i]),data))        //append存入数组 将对应字符以及密文储存进d数组
+        if chr(valid_ascii[i]) == '_':            // '_'字符是最后一个，为了中断for程序，进行判断并中断
             break
 
-def encrypt_flag_char(index,length):
+def encrypt_flag_char(index,length):            //检查字典与flag对应的密文，并进行存储
     p.recvline(b'Choice?')
-    p.sendline(b'2')
+    p.sendline(b'2')                    //这里进入第二个选择，加密flag
     p.recvline(b'Index?')
-    p.sendline(str(index).encode())
+    p.sendline(str(index).encode())        //index 代表第几个字符
     p.recvuntil(b'Length?')
-    p.sendline(str(length).encode())
+    p.sendline(str(length).encode())        //长度固定为1，方便对照
     p.recvuntil(b'Result:')
-    return p.recvline().strip()
+    return p.recvline().strip()            //获取flag单字节密文
 
-encryascii(len(valid_ascii))
+encryascii(len(valid_ascii))            //执行加密字典
 
-flag = ''
-for idx in range(58):
-    encry_char = encrypt_flag_char(idx, 1)
-    for char, enc_data in d:
-        if enc_data == encry_char:
-            flag += char
+flag = ''                //设立空的flag字符串
+for idx in range(58):            //对照字典，进行flag输入
+    encry_char = encrypt_flag_char(idx, 1)            //将flag每一个字节加密的结果，作为encry_char变量
+    for char, enc_data in d:                //开始对密文进行字典内的逐个对比
+        if enc_data == encry_char:          //如果相同
+            flag += char                    //flag便加上对应密文的字符，并中断
             print(f"Found character {char} at index {idx}")
             break
 
 #for idx, data in enumerate(d):
     #print(f"Result for {chr(valid_ascii[idx])}: {data.decode()}")
-print(f"the flag {flag}")
+print(f"the flag {flag}")                输出flag 大功告成！！！
+
+#总而言之，这道题我的收获还是非常丰富的，教会了我如何用python脚本进行进程的控制与对话。并结合程序实现自动化解密，非常有意思...
