@@ -1,0 +1,17 @@
+#挑战简介
+
+Okay, now we'll try that attack in a slightly more realistic scenario. Can you remember your SQL to carry out the attack and recover the flag?
+
+HINT: Remember that you can make select return chosen plaintext by doing SELECT 'my_plaintext'!
+
+#此题和上一题的思路一样，创造字典，对flag全部字符加密，再进行对照得出
+#只不过这一次是对网站进行此操作，所以需要一些新语法
+#代码如下：
+
+*网站交互代码：
+p.remote('example.com', 80)    //接入交互网址
+param = "param=" + your_param      //参数输入
+request = b"GET /?" + param.encode() + b" HTTP/1.1\r\n"    //GET请求头
+request += b"Host: example.com\r\n"      //网址
+request += b"Connection: close\r\n" 
+request += b"\r\n"
