@@ -1,0 +1,52 @@
+#挑战简介
+Okay, now let's complicate things slightly to increase the realism. It's rare that you can just craft queries for the plaintext that you want. However, it's less rare that you can isolate the tail end of some data into its own block, 
+and in ECB, this is bad news. We'll explore this concept in this challenge, replacing your ability to query substrings of the flag with just an ability to encrypt some bytes off the end.
+
+Show us that you can still solve this!
+
+HINT: Keep in mind that, once you recover some part of the end of the flag, you can build a new codebook with additional prefixes of the known parts, and repeat the attack on the previous byte!
+
+#思路差不多和前面的，但是要求一点点算法逻辑
+#此题为本地process
+#1选项和前面的一样
+#2选项则是问加密长度，从flag后往前进行加密，此谓后缀
+
+#思路很好想，创立一个空字符串用来储存flag从后往前一步步加密解出的结果
+#例如，先对flag最后的字符加密进行字典对比，解出后字符串赋值如'}'    //设空字符串encry_str
+#length+1，对后两个字符的加密结果，与chr(valid_ascii)+encry_str的加密结果进行字典对比，如此推进，便可解出
+
+#核心代码如下:
+def encryascii_suf(enc_str):      //字典加密
+#    for i in range(number):
+        p.recvline(b'Choice?')
+        p.sendline(b'1')
+        p.recvuntil(b'Data?')
+        p.sendline(enc_str.encode())
+        p.recvuntil(b'Result:')
+        data=p.recvline().strip()
+        return data
+#        if chr(valid_ascii[i]) == '_':
+#            break
+
+def encrypt_flag_char(length):
+    p.recvline(b'Choice?')
+    p.sendline(b'2')
+#    p.recvline(b'Index?')
+#    p.sendline(str(index).encode())
+    p.recvuntil(b'Length?')
+    p.sendline(str(length).encode())
+    p.recvuntil(b'Result:')
+    return p.recvline().strip()
+
+encry_str = ''      //空字符串，用于对照
+flag = ''
+
+for lengt in range(1,59):
+    encry_char = encrypt_flag_char(lengt)
+    for char in valid_ascii:
+        candidate = chr(char) + encry_str      //字符+解出结果，因为是后缀
+        if encryascii_suf(candidate) == encry_char:      //字符串密文对照
+            flag = candidate        //更新flag
+            encry_str = candidate      //更新结果
+            print(f"Found character {chr(char)} at index {lengt}")
+            break
