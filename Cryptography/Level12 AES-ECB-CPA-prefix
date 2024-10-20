@@ -1,0 +1,45 @@
+#挑战简介
+Okay, now let's complicate things slightly. It's not so common that you can just chop off the end of interesting data and go wild. However, 
+much more common is the ability to prepend chosen plaintext to a secret before it's encrypted. If you carefully craft the prepended data so that it 
+pushes the end of the secret into a new block, you've just successfully isolated it, accomplishing the same as if you were chopping it off!
+
+Go ahead and do that in this challenge. The core attack is the same as before, it just involves more data massaging.
+
+HINT: Keep in mind that a typical pwn.college flag is somewhere upwards of 50 bytes long. This is four blocks (three full and one partial), 
+and the length can vary slightly. You will need to experiment with how many bytes you must prepend to push even one of the end characters to its own block.
+
+HINT: Keep in mind that blocks are 16 bytes long! After you leak the last 16 bytes, you'll be looking at the second-to-last block, and so on.
+
+#两个选项:
+1.对你输入的明文进行加密
+2.将你输入的数据插入到flag前面，总体进行加密，并告知你分块结果(16个字节一个块)
+
+#思路有些新奇
+#已知16个字节一个块，那么我们可以进行块对比
+#(基础思想)前15个字节固定，可判断你所查询的单个字节
+#我们可以固定关注第四个块
+#设定一个观察块，附上大于等于flag大小的a数量，格式为'a' * (64-lengt)
+#另一个则是猜测块，格式为'a' * (64-lengt) + flag + guess_char (flag的作用为输入已猜测出的flag字符，这样方便集中一个字符进行猜测)
+#这便是核心思路，代码如下
+
+def encrypt_with_prefix(prefix):
+    p.recvline(b'Choice?')
+    p.sendline(b'2')
+    p.recvline(b'Data?')
+    p.sendline(prefix.encode())
+    p.recvuntil(b'Result: ')
+    result = p.recvline().strip().decode()
+    base_result = base64.b64decode(result)
+    first_16_chars = base_result[47:64]
+    print(first_16_chars)
+    return first_16_chars
+
+for lengt in range(1,64):
+    target_block = encrypt_with_prefix('a' * (64-lengt))
+    for char in valid_ascii:
+        guess_char = chr(char)
+        guess_block = encrypt_with_prefix('a' * (64-lengt) + flag + guess_char)
+        if guess_block == target_block:
+            flag = flag + guess_char
+            print(f"Found character {chr(char)} at index {lengt}")
+            break
