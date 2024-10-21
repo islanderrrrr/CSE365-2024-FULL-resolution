@@ -1,0 +1,18 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you will work understand how UNIX permissions works with multiple users.
+
+You'll also be given access to various user accounts, use su to switch between them.
+
+
+Before:
+-r-------- 1 root root 58 Oct 21 13:15 /flag
+Created user user_xnkrltak with password luepqirz
+After:
+----r----- 1 root user_xnkrltak 58 Oct 21 13:15 /flag
+
+#挑战水的不想解释了，登入进去后直接便可以查看，每个用户默认分在署名为自己名字的组，直接cat
