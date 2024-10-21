@@ -1,0 +1,23 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you will work understand how UNIX permissions works with multiple users.
+
+You'll also be given access to various user accounts, use su to switch between them.
+
+
+Before:
+-------r-- 1 hacker root 58 Oct 21 12:52 /flag
+Created user user_mesyopuz with password dczzdggx
+After:
+-------r-- 1 hacker root 58 Oct 21 12:52 /flag
+
+#上次转换组，这次转换用户
+#可以用su去转换控制用户
+su USER_NAME
+Password: ENTER_YOUR_PASSWORD
+
+#ok
