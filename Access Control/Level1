@@ -1,0 +1,20 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you will work with different UNIX permissions on the flag.
+
+The flag file will be owned by you and have 400 permissions.
+
+
+Before:
+-r-------- 1 hacker root 58 Oct 21 08:28 /flag
+After:
+-r-------- 1 hacker root 58 Oct 21 08:28 /flag
+
+#此文件属于你，你属于root组，你能做什么还需多言吗？(
+cat /flag
+
+#🈚️
