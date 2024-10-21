@@ -1,0 +1,23 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you will work with different UNIX permissions on the flag.
+
+The flag file is owned by root and a new group.
+
+Hint: Search for how to join a group with a password.
+
+
+Before:
+----r----- 1 root group_rguuvszx 58 Oct 21 08:18 /flag
+After:
+----r----- 1 root group_xwhtmbiu 58 Oct 21 08:18 /flag
+The password for group_xwhtmbiu is: hpvlaimw
+
+#此题要求你，创造一个组，并设入密码，然后没了～～
+#一个语句
+newgrp GROUP
+########################
