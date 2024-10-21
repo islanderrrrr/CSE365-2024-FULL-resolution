@@ -1,0 +1,30 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you will work understand how UNIX permissions works with multiple users.
+
+You'll also be given access to various user accounts, use su to switch between them.
+
+Hint: How can you tell which user is in what group?
+
+
+Before:
+-r-------- 1 root root 58 Oct 21 15:05 /flag
+Created user user_ptbhdkqs with password rxtakyum
+Created user user_gxhzmqaw with password zepblsdh
+Created user user_jkdercec with password atluijtk
+Created user user_gbsoxbpu with password sjsnybzx
+Created user user_lthckzpu with password jlzpbonf
+Created user user_hfvbuyqg with password kywawhum
+Created user user_zcnwggls with password oxziwinf
+Created user user_jvqvggvc with password ovvesdtc
+Created user user_efkyklue with password uzlupguy
+Created user user_lfwfjbzi with password zbthgqex
+After:
+----r----- 1 root group_zio 58 Oct 21 15:05 /flag
+
+#从众多user里找一个在指定group里的user，可以用命令
+getent group GROUP
