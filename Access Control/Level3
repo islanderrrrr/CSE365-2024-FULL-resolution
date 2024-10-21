@@ -1,0 +1,20 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you will work with different UNIX permissions on the flag.
+
+The flag file will be owned by you and have 000 permissions.
+
+
+Before:
+-r-------- 1 root root 58 Oct 21 08:35 /flag
+After:
+---------- 1 hacker root 58 Oct 21 08:35 /flag
+
+#新概念，加权限，linux章节学过的
+chmod -OPTION FILE
+#无须多言
+chmod +rwx /flag
