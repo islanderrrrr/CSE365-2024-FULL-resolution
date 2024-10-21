@@ -1,0 +1,23 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you will work understand how the SETUID bit for UNIX permissions works.
+
+What if /bin/cp had the SETUID bit set?
+
+Hint: Look into how cp will deal with different permissions.
+
+Another Hint: check the man page for cp, any options in there that might help?
+
+
+Before:
+-rwxr-xr-x 1 root root 153976 Sep  5  2019 /bin/cp
+After:
+-rwsr-xr-x 1 root root 153976 Sep  5  2019 /bin/cp
+
+#这边和上一次唯一的区别，给了cp程序权限
+#你要会用cp(copy)
+#cp FILE TO_FILE
