@@ -1,0 +1,20 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you will work understand how the SETUID bit for UNIX permissions works.
+
+What if /bin/cat had the SETUID bit set?
+
+
+Before:
+-rwxr-xr-x 1 root root 43416 Sep  5  2019 /bin/cat
+After:
+-rwsr-xr-x 1 root root 43416 Sep  5  2019 /bin/cat
+
+#SUID 即SETUID，设定某个程序，让user可以在用它的时候获取与root同等的权限
+#同样也有SGID
+
+直接cat便是
