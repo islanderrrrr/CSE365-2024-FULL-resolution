@@ -1,0 +1,37 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you'll be answering questions about the category-based Bell–LaPadula model of Mandatory Access Control.
+
+Answer the question about the model to get the flag.
+
+
+In this challenge, your goal is to answer 1 questions correctly in 120 seconds about the following Mandatory Access Control (MAC) system:
+4 Levels (first is highest aka more sensitive):
+TS
+S
+C
+UC
+4 Categories:
+UFO
+NATO
+ACE
+NUC
+Q 1. Can a Subject with level TS and categories {ACE} read an Object with level TS and categories {UFO, NATO, NUC}?
+no 
+Correct!
+
+#主体的分类权限必须是客体的分类权限的超集
+#来，Chat:
+在多级安全模型中，不仅考虑安全级别（如TS、S、C、UC），还要考虑分类（Categories），主体必须具备对象的所有分类权限才能读取该对象。这意味着**主体的分类权限必须是对象分类的超集**，才允许读取。
+
+在这个问题中：
+- 主体的级别是**TS**（绝密），分类是**{ACE}**。
+- 对象的级别也是**TS**，但分类是**{UFO, NATO, NUC}**。
+
+虽然主体的安全级别与对象相同（TS），但主体的分类权限**{ACE}**没有涵盖对象的所有分类（对象有**UFO、NATO、NUC**，而主体没有这些分类权限）。根据“分类匹配”规则，主体需要具备这些分类才能访问该对象。因此，**主体不能读取这个对象**。
+
+**总结：** 主体的安全级别足够高，但缺少对象所需的分类权限，所以读取被拒绝。
