@@ -1,0 +1,38 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you will work understand how UNIX permissions for directories work with multiple users.
+
+You'll be given access to various user accounts, use su to switch between them.
+
+
+Created user user_sijyqygo with password ivwahjyr
+Created user user_lrfiicpd with password fopmpelj
+Created user user_kaizfpdc with password ccqmuink
+A copy of the flag has been placed somewhere in /tmp:
+total 60
+drwxrwxrwt 1 root   root          4096 Oct 22 06:28 .
+drwxr-xr-x 1 root   root          4096 Oct 22 06:27 ..
+drwxrwxrwt 2 hacker hacker        4096 Oct 22 06:27 .ICE-unix
+-r--r--r-- 1 hacker hacker          11 Oct 22 06:27 .X0-lock
+drwxrwxrwt 2 hacker hacker        4096 Oct 22 06:27 .X11-unix
+-rw-rw-r-- 1 root   root             4 Sep  6 16:43 .cc.txt
+-rw-r--r-- 1 root   root            55 Sep  6 16:43 .crates.toml
+-rw-r--r-- 1 root   root           453 Sep  6 16:43 .crates2.json
+drwxr-xr-x 2 hacker hacker        4096 Oct 22 06:27 .dojo
+-rw------- 1 hacker hacker         466 Oct 22 06:27 .xfsm-ICE-3U0VV2
+drwxr-xr-x 2 root   root          4096 Sep  6 16:43 bin
+srwxrwxrwx 1 hacker hacker           0 Oct 22 06:27 dbus-jBsAIPoruA
+drwxr-xr-x 1 root   root          4096 Sep  6 16:25 hsperfdata_root
+drwx------ 2 hacker hacker        4096 Oct 22 06:27 ssh-XXXXXXxloSr0
+drwx------ 2    104           105 4096 Sep 15 08:48 tmp.G9qthVCks5
+dr-xr-x--x 3 root   user_sijyqygo 4096 Oct 22 06:28 tmp9x1_q93a
+srwxr-xr-x 1 hacker hacker           0 Oct 22 06:28 vscode-git-86eca39556.sock
+srwxr-xr-x 1 hacker hacker           0 Oct 22 06:28 vscode-ipc-08e57198-00d2-4ffb-87a1-cc744537b554.sock
+srwxr-xr-x 1 hacker hacker           0 Oct 22 06:28 vscode-ipc-940017c6-de48-44c2-b976-164192b76143.sock
+
+#这几把玩意纯折磨，和上一题一个思路，只不过flag多藏了一层文件，要多用一个账号，其他没区别
+#无语😓
