@@ -1,0 +1,79 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you'll be answering questions about the category-based Bell–LaPadula model of Mandatory Access Control.
+
+Answer the questions about the model to get the flag.
+
+
+In this challenge, your goal is to answer 5 questions correctly in 120 seconds about the following Mandatory Access Control (MAC) system:
+4 Levels (first is highest aka more sensitive):
+TS
+S
+C
+UC
+4 Categories:
+NATO
+ACE
+UFO
+NUC
+Q 1. Can a Subject with level S and categories {NATO, UFO, NUC} write an Object with level S and categories {NUC}?
+yes
+Incorrect!
+hacker@access-control~level16:~$ /challenge/run
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you'll be answering questions about the category-based Bell–LaPadula model of Mandatory Access Control.
+
+Answer the questions about the model to get the flag.
+
+
+In this challenge, your goal is to answer 5 questions correctly in 120 seconds about the following Mandatory Access Control (MAC) system:
+4 Levels (first is highest aka more sensitive):
+TS
+S
+C
+UC
+4 Categories:
+NATO
+ACE
+UFO
+NUC
+Q 1. Can a Subject with level S and categories {NATO, UFO, NUC} write an Object with level S and categories {NUC}?
+no 
+Correct!
+Q 2. Can a Subject with level TS and categories {ACE, UFO} read an Object with level TS and categories {NATO, UFO, NUC}?
+no
+Correct!
+Q 3. Can a Subject with level S and categories {NATO, UFO, NUC} read an Object with level S and categories {ACE, NUC}?
+no
+Correct!
+Q 4. Can a Subject with level TS and categories {NATO, ACE, UFO} read an Object with level C and categories {UFO}?
+yes
+Correct!
+Q 5. Can a Subject with level TS and categories {ACE, NUC} read an Object with level TS and categories {NATO, ACE}?
+no
+Correct!
+
+#分类的5道题，我觉得思前想后还是AI说的对
+主体**不能读取或写入**它没有权限的分类信息。分类控制和安全级别共同决定主体对客体的访问权限，以下是详细的规则：
+
+### 读取规则（根据Bell-LaPadula模型）：
+- **安全级别**：主体只能读取与自己安全级别相同或更低的客体（“不可向上读取”原则）。
+- **分类**：主体必须具备客体的所有分类权限，才能读取该客体。如果主体缺少客体的一些分类权限，即便安全级别合适，主体也不能读取该客体。
+
+### 写入规则（根据Bell-LaPadula模型的星号属性）：
+- **安全级别**：主体只能写入与自己安全级别相同或更高的客体（防止信息向低安全级别泄露）。
+- **分类**：主体只能写入与自己相同或更多分类权限的客体。主体不能写入缺少一些分类权限的客体，因为这样可能会泄露敏感信息。如果主体缺少某些分类权限，它也不能向具备这些分类的客体写入信息。
+
+### 总结：
+- 主体不能读取客体中包含自己没有分类权限的信息。
+- 主体不能写入客体中缺少自己所具备的分类权限的对象，以防止信息泄露。
+
+因此，分类的匹配是访问控制的核心之一，确保主体只能接触它有权限访问的信息。
