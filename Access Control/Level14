@@ -1,0 +1,77 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you'll be answering questions about the standard Bell–LaPadula model of Mandatory Access Control.
+
+Answer the questions about the model to get the flag.
+
+
+In this challenge, your goal is to answer 5 questions correctly in 120 seconds about the following Mandatory Access Control (MAC) system:
+4 Levels (first is highest aka more sensitive):
+TS
+S
+C
+UC
+Q 1. Can a Subject with level C read an Object with level C?
+yes
+Correct!
+Q 2. Can a Subject with level UC read an Object with level S?
+no
+Correct!
+Q 3. Can a Subject with level S write an Object with level UC?
+yes
+Incorrect!
+hacker@access-control~level14:~$ /challenge/run
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you'll be answering questions about the standard Bell–LaPadula model of Mandatory Access Control.
+
+Answer the questions about the model to get the flag.
+
+
+In this challenge, your goal is to answer 5 questions correctly in 120 seconds about the following Mandatory Access Control (MAC) system:
+4 Levels (first is highest aka more sensitive):
+TS
+S
+C
+UC
+Q 1. Can a Subject with level C read an Object with level C?
+yes
+Correct!
+Q 2. Can a Subject with level UC read an Object with level S?
+no 
+Correct!
+Q 3. Can a Subject with level S write an Object with level UC?
+no
+Correct!
+Q 4. Can a Subject with level TS read an Object with level UC?
+yes
+Correct!
+Q 5. Can a Subject with level UC write an Object with level UC?
+yes
+Correct!
+
+#这里5个问题，都是关于主体客体的权限
+#注意:写入文件只能写入与自己相同或更高级的客体
+#读取文件只能读取比自己低级或相同的客体
+#这里是Ai的解释:
+1. **Can a Subject with level C read an Object with level C?**
+   - **Yes**. 根据Bell-LaPadula模型的简单安全规则（Simple Security Property），主体可以读取与其安全级别相同或更低的对象。因为主体和对象的级别都是C（机密），所以读取是允许的。
+
+2. **Can a Subject with level UC read an Object with level S?**
+   - **No**. 在Bell-LaPadula模型中，主体只能读取与自己级别相等或低于自己级别的对象（“不可向上读取”原则）。UC（未分类）级别的主体不能读取S（秘密）级别的对象，因为S比UC更高。
+
+3. **Can a Subject with level S write an Object with level UC?**
+   - **No**. 根据Bell-LaPadula模型的“星号属性”（Star Property），主体只能写入与自己相同或更高级别的对象，目的是防止高机密信息向低机密级别泄露。因为UC（未分类）比S（秘密）低，所以S级别的主体不能将信息写入UC级别的对象。
+
+4. **Can a Subject with level TS read an Object with level UC?**
+   - **Yes**. Bell-LaPadula的简单安全规则允许主体读取低于或等于自己级别的对象。TS（绝密）比UC（未分类）高，所以TS级别的主体可以读取UC级别的对象。
+
+5. **Can a Subject with level UC write an Object with level UC?**
+   - **Yes**. UC（未分类）级别的主体可以写入与自己同级别的对象，因为这不会涉及泄露更高机密的信息，也符合Bell-LaPadula模型的规则。
