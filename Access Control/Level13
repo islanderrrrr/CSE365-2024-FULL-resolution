@@ -1,0 +1,35 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you'll be answering questions about the standard Bell–LaPadula model of Mandatory Access Control.
+
+Answer the question about the model to get the flag.
+
+
+In this challenge, your goal is to answer 1 questions correctly in 120 seconds about the following Mandatory Access Control (MAC) system:
+4 Levels (first is highest aka more sensitive):
+TS
+S
+C
+UC
+Q 1. Can a Subject with level UC read an Object with level UC?
+yes
+
+#这里是一个判断题
+#UC (未分类)级别，这里我引用ai的解释吧
+好的，我来解释一下。
+
+在计算机安全模型中，像 Bell-LaPadula 这样的模型主要用于保护信息的机密性。它定义了谁可以访问哪些数据，防止机密信息被泄露。一个关键规则叫做 “简单安全规则”（simple security property），它规定：
+
+- **主体（Subject）**：可以是一个用户、进程，或其他能访问数据的实体。
+- **对象（Object）**：是文件、数据库等被访问的数据。
+
+**规则：** 主体只能读取与其安全级别相同或比它低的对象。
+
+所以，如果主体和对象的安全级别都是 UC（未分类），那么它们属于同一安全级别，主体当然可以读取这个对象。这是因为主体没有尝试访问比自己权限更高的信息，规则允许同级或更低的访问。
+
+用比喻来说，想象你和你的朋友都在同一间“普通”房间（UC级别），你可以自由地查看房间内的所有物品（对象），因为这些物品对你没有任何限制。
+#chatgpt🐮🖊️
