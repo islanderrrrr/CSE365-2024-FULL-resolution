@@ -1,0 +1,41 @@
+#挑战简介
+===== Welcome to Access Control! =====
+In this series of challenges, you will be working with various access control systems.
+Break the system to get the flag.
+
+
+In this challenge you will work understand how UNIX permissions for directories work with multiple users.
+
+You'll be given access to various user accounts, use su to switch between them.
+
+
+Created user user_almphogp with password njuktied
+Created user user_tjlbuzrq with password ayqvctkn
+A copy of the flag has been placed somewhere in /tmp:
+total 60
+drwxrwxrwt 1 root   root          4096 Oct 22 06:14 .
+drwxr-xr-x 1 root   root          4096 Oct 22 06:13 ..
+drwxrwxrwt 2 hacker hacker        4096 Oct 22 06:13 .ICE-unix
+-r--r--r-- 1 hacker hacker          11 Oct 22 06:13 .X0-lock
+drwxrwxrwt 2 hacker hacker        4096 Oct 22 06:13 .X11-unix
+-rw-rw-r-- 1 root   root             4 Sep  6 16:43 .cc.txt
+-rw-r--r-- 1 root   root            55 Sep  6 16:43 .crates.toml
+-rw-r--r-- 1 root   root           453 Sep  6 16:43 .crates2.json
+drwxr-xr-x 2 hacker hacker        4096 Oct 22 06:13 .dojo
+-rw------- 1 hacker hacker         466 Oct 22 06:13 .xfsm-ICE-PJ5TV2
+drwxr-xr-x 2 root   root          4096 Sep  6 16:43 bin
+srwxrwxrwx 1 hacker hacker           0 Oct 22 06:13 dbus-S2PkM3cdof
+drwxr-xr-x 1 root   root          4096 Sep  6 16:25 hsperfdata_root
+drwx------ 2 hacker hacker        4096 Oct 22 06:13 ssh-XXXXXX4FaQcu
+drwx------ 2    104           105 4096 Sep 15 08:48 tmp.G9qthVCks5
+dr-xr-x--x 2 root   user_almphogp 4096 Oct 22 06:14 tmps55zfdhn
+srwxr-xr-x 1 hacker hacker           0 Oct 22 06:13 vscode-git-86eca39556.sock
+srwxr-xr-x 1 hacker hacker           0 Oct 22 06:13 vscode-ipc-5b3d46f6-6411-4d14-b9b6-84b74957414b.sock
+srwxr-xr-x 1 hacker hacker           0 Oct 22 06:13 vscode-ipc-8685d2db-54a1-42a0-b415-661e5f1d2497.sock
+
+#这道题相当于一次综合练习
+#给予了两个账号，在众多文件中找到被赋予(copy)了flag的文件
+#这里我们可以通过长度找flag，flag长度一般为58(57char + \n)
+#查看和账号相关联的文件，不难找到，flag在tmps55zfdhn里
+#又通过ls -al发现，文件夹里的文件只有另一个账号可查看，因此用另一个账号cat里面的文件，即可
+###
