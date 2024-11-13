@@ -45,38 +45,38 @@ access组成以下几点:
 .section .text
 
 _start:
-    mov rax, 41
-    mov rdi, 2
-    mov rsi, 1
-    mov rdx, 0
-    syscall
-    mov r12, rax
+    mov rax, 41       ; 系统调用号 41 对应 socket
+    mov rdi, 2        ; domain = AF_INET (IPv4)
+    mov rsi, 1        ; type = SOCK_STREAM (TCP)
+    mov rdx, 0        ; protocol = IPPROTO_IP (默认协议)
+    syscall            ; 执行系统调用
+    mov r12, rax        ; 保存套接字文件描述符
 
-    sub rsp, 16
+    sub rsp, 16        ; 为 sockaddr_in 分配 16 字节空间
     
-    mov word ptr [rsp], 2
-    mov word ptr [rsp+2], 0x5000
-    mov word ptr [rsp+4], 0
-    mov rdi, r12
-    mov rsi, rsp
-    mov rdx, 16
-    mov rax, 49
-    syscall
+    mov word ptr [rsp], 2        ; sa_family (AF_INET)
+    mov word ptr [rsp+2], 0x5000        ; 端口号 80，网络字节序（0x5000 -> htons(80)）
+    mov word ptr [rsp+4], 0         ; IP 地址 (INADDR_ANY，即 0.0.0.0)
 
-    add rsp, 16
-    
-    mov rax, 50
-    mov rdi, r12
-    mov rsi, 0
-    syscall
+    mov rdi, r12                ; 套接字文件描述符
+    mov rsi, rsp        ; sockaddr_in 结构体的地址
+    mov rdx, 16        ; sockaddr_in 结构体的大小
+    mov rax, 49        ; 系统调用号 49 对应 bind
+    syscall        ; 执行系统调用
 
-    
-    mov rdi, r12
-    mov rsi, 0
-    mov rdx, 0
-    mov rax, 43 
+    add rsp, 16                    ; 清理栈上分配的空间
+
+    mov rax, 50      ;50参数调用
+    mov rdi, r12        ;r12套接字，赋值上第一个参数
+    mov rsi, 0          ;backlog设置0
     syscall
-    mov r13, rax
+   
+    mov rdi, r12        ; socket 文件描述符
+    mov rsi, 0        ; NULL
+    mov rdx, 0        ; NULL
+    mov rax, 43         ; syscall: accept
+    syscall
+    mov r13, rax            ; 保存客户端 socket 文件描述符
 _end:
     mov rdi, 0
     mov rax, 60
