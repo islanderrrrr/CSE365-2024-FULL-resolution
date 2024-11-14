@@ -8,7 +8,7 @@
 
 $ cat server.s
 .intel_syntax noprefix
-.globl _start
+.globl _socket
 
 .section .text
 
@@ -44,7 +44,7 @@ $ /challenge/run ./server
 
 .section .text
 
-_start:
+_socket:
     mov rax, 41       ; 系统调用号 41 对应 socket
     mov rdi, 2        ; domain = AF_INET (IPv4)
     mov rsi, 1        ; type = SOCK_STREAM (TCP)
@@ -52,6 +52,7 @@ _start:
     syscall            ; 执行系统调用
     mov r12, rax        ; 保存套接字文件描述符
 
+_bind:
     sub rsp, 16        ; 为 sockaddr_in 分配 16 字节空间
     
     mov word ptr [rsp], 2        ; sa_family (AF_INET)
@@ -66,11 +67,13 @@ _start:
 
     add rsp, 16                    ; 清理栈上分配的空间
 
+_listen: 
     mov rax, 50      ;50参数调用
     mov rdi, r12        ;r12套接字，赋值上第一个参数
     mov rsi, 0          ;backlog设置0
     syscall
-   
+
+_accept:    
     mov rdi, r12        ; socket 文件描述符
     mov rsi, 0        ; NULL
     mov rdx, 0        ; NULL
@@ -78,6 +81,7 @@ _start:
     syscall
     mov r13, rax            ; 保存客户端 socket 文件描述符
 
+_read_request:
     sub rsp, 1024      ; 为读取请求创建一个 1024 字节的缓冲区
     mov rdi, r13        ; 客户端 socket 文件描述符
     mov rax, 0        ; syscall: read
@@ -85,16 +89,60 @@ _start:
     mov rdx, 1024      ; 读取最多 1024 字节
     syscall
 
+    lea rdi, [rsp+4]        # rdi 指向文件路径的开始（去掉 "GET " 前缀）
+    xor rdx, rdx        # 清空 rdx，准备用它作为计数器
+
+extract_path:
+    mov al, byte ptr [rdi+rdx]        # 读取请求中的下一个字节
+    cmp al, ' '        # 如果遇到空格（路径的结束标志），就跳出
+    je path_extracted        # 如果遇到空格，说明路径提取完毕
+    inc rdx        # 否则，继续向后移动
+    jmp extract_path
+
+path_extracted:
+    mov byte ptr [rdi+rdx], 0            # 在路径末尾加上空字符，作为字符串的终止符
+
+_open_file:
+    lea rdi, [rsp+4]            # 请求的路径
+    mov rsi, 0            # O_RDONLY
+    mov rax, 2            # SYS_open
+    syscall
+    mov r14, rax            # 保存文件描述符
+
+_read_files:
+    sub rsp, 1024            # 为文件内容分配缓冲区
+    mov rdi, r14            # 文件描述符
+    mov rsi, rsp            # 缓冲区存放文件内容
+    mov rdx, 1024            # 最大读取字节数
+    mov rax, 0            # SYS_read
+    syscall
+    mov r15, rax            # 保存实际读取的字节数
+
+_close_read:
+    mov rdi, r14             # 文件描述符
+    mov rax, 3                # SYS_close
+    syscall
+
+_respond_http_message:
     mov rdi, r13      ; 客户端 socket 文件描述符
     mov rax, 1        ; syscall: write
     lea rsi, [message]      ; 加载响应内容的地址
     mov rdx, 19      ; 响应内容长度,这里布置为何，无法获取message的len，只能手动定义
     syscall
 
+_write_operation:
+    mov rdi, r13            # 连接文件描述符
+    mov rsi, rsp            # 文件内容缓冲区
+    mov rdx, r15            # 文件内容的字节数
+    mov rax, 1            # SYS_write
+    syscall
+
+_close_http_request:
     mov rax, 3        ; syscall: close
     mov rdi, r13      ; 关闭客户端 socket
     syscall
 
+_exit:
     mov rdi, 0
     mov rax, 60
     syscall
