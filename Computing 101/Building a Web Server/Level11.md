@@ -110,25 +110,25 @@ _compare_to_mthod:
     loop _compare_to_mthod      ; 循环判定，每次rcx-1
 
 _extract_POST:
-    lea rdi, [rsp+5]
-    mov r11, 1
-    xor rdx, rdx
-    jmp extract_path_POST
+    lea rdi, [rsp+5]         ; 越过"POST "到文件路径
+    mov r11, 1                ; 作为POST的证明
+    xor rdx, rdx            ; 清空rdx
+    jmp extract_path_POST        ; 跳转到POST路径提取
 
 _extract_GET:
-    lea rdi, [rsp+4]
-    xor r11, r11
+    lea rdi, [rsp+4]           ; 到文件路径
+    xor r11, r11                ; 使r11为0，作为证明
     xor rdx, rdx
-    jmp extract_path_GET
+    jmp extract_path_GET        ; 跳转GET路径提取
 
 extract_path_POST:
-    mov al, byte ptr [rdi+rdx]
+    mov al, byte ptr [rdi+rdx]        ; 遇到空符号，则跳转
     cmp al, ' '
-    je path_extracted
-    inc rdx
-    jmp extract_path_POST
+    je path_extracted        
+    inc rdx                        ; 没遇到，则增加偏移量
+    jmp extract_path_POST           ; 循环 
 
-extract_path_GET:
+extract_path_GET:                    ; 同上 
     mov al, byte ptr [rdi+rdx]
     cmp al, ' '
     je path_extracted
@@ -136,35 +136,35 @@ extract_path_GET:
     jmp extract_path_GET
 
 path_extracted:
-    mov byte ptr [rdi+rdx], 0
-    cmp r11, 0
+    mov byte ptr [rdi+rdx], 0        ; 将结束符作为路径的结尾
+    cmp r11, 0                        ; 判定，跳转GET的处理
     je _open_file_GET
 
 _open_file_POST:
     lea rdi, [rsp+5]            # 请求的路径
-    mov rsi, 65            # O_RDONLY
-    mov rdx, 511            # SYS_open
-    mov rax, 2
+    mov rsi, 65            # O_WRONLY|O_CREAT
+    mov rdx, 511            # 加权0777是511
+    mov rax, 2            # open文件
     syscall
     mov r14, rax            # 保存文件描述符
 
-_defi_length:
-    lea rsi, [rsp+182]
-    xor rcx, rcx
+_defi_length:                # POST文件内容在本题中有十位长度或百位长度
+    lea rsi, [rsp+182]        # 默认为十位长度
+    xor rcx, rcx                # 清零计数器
 
 extract_message:
     mov al, byte ptr [rsi + rcx]      # 赋值内容每一个字符
     cmp al, 0                      # 如果为0，则跳转写入
-    je _write_files
-    cmp al, '\n'
+    je _write_files                
+    cmp al, '\n'                    # 如果是换行符，跳过
     je skip_newline
     inc rcx                        # 递增计数器
     jmp extract_message            # 循环重复
 
 skip_newline:
-    lea rsi, [rsp+183] 
-    xor rcx, rcx
-    jmp extract_message
+    lea rsi, [rsp+183]         # 则为百位长度
+    xor rcx, rcx                
+    jmp extract_message        # 再次开始提取内容
 
 _write_files:
     mov rdi, r14            # 文件描述符
@@ -176,20 +176,20 @@ _write_files:
     jmp _close_read
 
 _open_file_GET:
-    lea rdi, [rsp+4]
-    mov rsi, 0
-    mov rax, 2
+    lea rdi, [rsp+4]        #  打开文件，获取文件地址
+    mov rsi, 0            # O_RDONLY
+    mov rax, 2              # SYS_open 
     syscall
-    mov r14, rax
+    mov r14, rax            # 存储文件描述符 
 
 _read_files:
-    sub rsp, 1024
-    mov rdi, r14
-    mov rsi, rsp
-    mov rdx, 1024
-    mov rax, 0
+    sub rsp, 1024            # 为文件内容分配缓冲区
+    mov rdi, r14                # 文件描述符
+    mov rsi, rsp            # 缓冲区存放文件内容
+    mov rdx, 1024            # 最大读取字节数
+    mov rax, 0                # SYS_read
     syscall
-    mov r15, rax
+    mov r15, rax            # 保存实际读取的字节数
 
 _close_read:
     mov rdi, r14             # 文件描述符
@@ -200,7 +200,7 @@ _respond_http_message:
     mov rdi, r13      ; 客户端 socket 文件描述符
     mov rax, 1        ; syscall: write
     lea rsi, [message]      ; 加载响应内容的地址
-    mov rdx, 19      ; 响应内容长度,这里布置为何，无法获取message的len，只能手动定义
+    mov rdx, 19      ; 响应内容长度,这里不知为何，无法获取message的len，只能手动定义
     syscall
     cmp r11, 1
     je _exit
@@ -236,3 +236,5 @@ message_len = . - message        ; 不能用?
 str_post: 
     .ascii "POST"
 ```
+
+# 至此，一锤定音；尘埃，已然落定！
