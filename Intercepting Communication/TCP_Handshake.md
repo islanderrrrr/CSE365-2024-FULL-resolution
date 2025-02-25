@@ -1,6 +1,8 @@
-#挑战简介
+# 挑战简介
 Manually perform a Transmission Control Protocol handshake
 
+# 思路
+```
 #模拟TCP三次握手
 #首先，Ether，IP，TCP的设置
 #着重TCP的设置
@@ -19,3 +21,4 @@ tcp_layer = TCP(sport=31337, dport=31337, flags="A", seq=seq_number, ack=ack_num
 #对ack_packet设置
 >>> ack_packet = eth / ip_packet / tcp_layer
 #sendp发送后，标志握手成功
+```
