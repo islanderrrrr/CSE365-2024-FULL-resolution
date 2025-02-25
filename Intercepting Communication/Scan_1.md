@@ -1,7 +1,8 @@
-#挑战简介
+# 挑战简介
 Find and connect to a remote host
 
-#知识点：10.0.0.0/24的意思是
+# 思路 
+知识点：10.0.0.0/24的意思是
 /24 对应的子网掩码是 255.255.255.0，换句话说：
 
 	•	前 24 位（即前三个字节）用于标识网络，10.0.0 表示网络部分。
@@ -9,5 +10,7 @@ Find and connect to a remote host
 
 #这边用nc不好操作，可以选择用nmap
 两个方法：
+```
 nmap -v -p port ip
 nmap -sT -p port ip
+```
